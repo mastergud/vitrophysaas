@@ -1,6 +1,33 @@
 import { Sidebar } from "@/components/features/admin-sidebar"
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from "next/navigation"
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+async function ensureAdmin() {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect("/login")
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single()
+
+  const role = profile?.role ?? "student"
+
+  if (role !== "admin" && role !== "expert") {
+    redirect("/workshop")
+  }
+}
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await ensureAdmin()
+
   return (
     <div className="flex min-h-screen bg-[radial-gradient(circle_at_top,_#0f0f10,_#050506)] text-white">
       <div className="hidden w-64 md:block">

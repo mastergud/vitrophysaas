@@ -1,6 +1,31 @@
 import { ClipboardList, QrCode, Clock3, type LucideIcon } from "lucide-react"
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from "next/navigation"
 
-export default function WorkshopLayout({ children }: { children: React.ReactNode }) {
+async function ensureWorkshopAccess() {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect("/login")
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single()
+
+  const role = profile?.role ?? "student"
+
+  return role
+}
+
+export default async function WorkshopLayout({ children }: { children: React.ReactNode }) {
+  await ensureWorkshopAccess()
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-zinc-900 via-zinc-950 to-black text-white">
       <header className="px-5 pb-4 pt-8">
