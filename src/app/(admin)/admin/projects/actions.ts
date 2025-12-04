@@ -7,6 +7,7 @@ import { createClient } from "@/utils/supabase/server"
 
 type ActionState = {
   error: string | null
+  success?: boolean
 } | undefined
 
 const createProjectSchema = z.object({
@@ -179,7 +180,7 @@ export async function updateProjectStatus(_: ActionState, formData: FormData) {
 
   revalidatePath("/admin/projects")
   revalidatePath("/admin/projects/kanban")
-  return { success: true }
+  return { success: true, error: null }
 }
 
 const bulkItemsSchema = z.object({
@@ -284,6 +285,6 @@ export async function createBatEntry(_: ActionState, formData: FormData) {
 
   revalidatePath(`/admin/projects/${project_id}`)
   revalidatePath("/admin/projects")
-  return { success: true }
+  return { success: true, error: null }
 }
 

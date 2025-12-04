@@ -136,7 +136,7 @@ async function ProjectContent({ id }: { id: string }) {
 
         <div className="space-y-3">
           {typedProject.project_items?.length ? (
-            typedProject.project_items.map((item) => (
+            typedProject.project_items.map((item: Database["public"]["Tables"]["project_items"]["Row"]) => (
               <div
                 key={item.id}
                 className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-black/30 backdrop-blur"

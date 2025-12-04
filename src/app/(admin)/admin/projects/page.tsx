@@ -44,8 +44,11 @@ export default function ProjectsPage() {
   )
 }
 
-type ProjectWithClient = Database["public"]["Tables"]["projects"]["Row"] & {
-  clients: { name: string | null } | null
+type ProjectWithClient = Pick<
+  Database["public"]["Tables"]["projects"]["Row"],
+  "id" | "reference" | "title" | "status" | "deadline" | "tray_number"
+> & {
+  clients: { name: string | null }[] | null
 }
 
 async function ProjectsTable() {
@@ -71,7 +74,7 @@ async function ProjectsTable() {
     )
   }
 
-  const typedProjects = projects as ProjectWithClient[]
+  const typedProjects = (projects ?? []) as ProjectWithClient[]
 
   const sortedProjects = [...typedProjects].sort((a, b) => {
     const metaA = getDeadlineMeta(a.deadline)
@@ -99,6 +102,7 @@ async function ProjectsTable() {
         </TableHeader>
         <TableBody>
           {sortedProjects.map((project) => {
+            const clientName = project.clients?.[0]?.name ?? "–"
             const deadlineMeta = getDeadlineMeta(project.deadline)
             return (
             <TableRow
@@ -111,7 +115,7 @@ async function ProjectsTable() {
                   <p className="text-xs text-white/50">{project.title}</p>
                 </div>
               </TableCell>
-              <TableCell>{project.clients?.name || "–"}</TableCell>
+              <TableCell>{clientName}</TableCell>
               <TableCell>
                 <ProjectStatusBadge status={project.status} />
               </TableCell>

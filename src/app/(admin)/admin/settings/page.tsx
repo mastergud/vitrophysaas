@@ -6,6 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ItemPresetsManager } from "@/components/features/item-presets-manager"
 
+async function simpleSaveSetting(formData: FormData) {
+  "use server"
+  await saveSetting(undefined, formData)
+}
+
 const defaultItemPresets = [
   { label: "Trophée verre 10mm", type: "glass_trophy", specs: { thickness: "10mm", technique: "uv_gluing" } },
   { label: "Médailles 50mm", type: "medal", specs: { diameter: "50mm", lanyard: "tricolore" } },
@@ -73,7 +78,7 @@ function SettingsCard({
         <p className="text-sm text-white/60">{description}</p>
       </CardHeader>
       <CardContent>
-        <form action={saveSetting} className="space-y-3">
+        <form action={simpleSaveSetting} className="space-y-3">
           <input type="hidden" name="key" value={name} />
           <Textarea
             name="value"
