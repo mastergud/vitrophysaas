@@ -36,7 +36,6 @@ export default function DashboardPage() {
             </div>
           </div>
           <Suspense fallback={<Skeleton className="h-[200px] rounded-2xl bg-white/10" />}>
-            {/* @ts-expect-error Server Component */}
             <RecentProjects />
           </Suspense>
         </GlassCard>

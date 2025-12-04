@@ -4,6 +4,8 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+export const runtime = "nodejs";
+
 export const metadata: Metadata = {
   title: "Vitrophy OS",
   description: "ERP for Vitrophy",
