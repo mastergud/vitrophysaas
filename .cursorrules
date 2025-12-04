@@ -1,0 +1,71 @@
+# VITROPHY OS - PROJECT CONTEXT & ARCHITECTURE
+
+## 1. VISION & CORE PHILOSOPHY
+We are building **Vitrophy OS**, a high-end Enterprise Resource Planning (ERP) system for a trophy manufacturing business.
+**The Goal:** Connect the Office (Admin/Sales) with the Workshop (Production) seamlessly, removing friction and mental load.
+**The Aesthetic:** "The Graal". An Apple-like, clean, spacious interface. Dark sidebars, crisp typography (Inter), Bento-grid layouts, and meaningful colors. No clutter.
+
+## 2. USER PERSONAS & SECURITY (RLS)
+The system relies on strict Role-Based Access Control (RBAC).
+* **ADMIN (Jérôme/Marvin):**
+    * *Access:* 100% Full Access.
+    * *Responsibilities:* Sales, Quotes, BAT (Design Proofs), Financials, Crisis Management.
+    * *UI:* Desktop-first "Control Tower" Dashboard.
+    * *Security:* Only role allowed to see `operations_private` schema (Prices, Margins).
+* **EXPERT (Laura):**
+    * *Access:* Production + Complex Tasks (UV Gluing, Glass work).
+    * *Responsibilities:* Handle high-value items, Quality Control.
+    * *UI:* Desktop/Tablet. Can unlock "Expert-only" tasks.
+* **STUDENT (Workshop Team):**
+    * *Access:* Production ONLY. Time Tracking.
+    * *Restrictions:* **MUST NEVER SEE PRICES OR CLIENT CONTACT INFO.**
+    * *UI:* Mobile-first/Tablet. Big buttons. "Tunnel vision" (only see what to do now).
+    * *HR Logic:* "Trust-based". They clock in/out but can edit their times manually if they forgot.
+
+## 3. BUSINESS LOGIC & WORKFLOW
+The lifecycle of a project (`VIT-25-XXX`) is linear but flexible:
+1.  **Lead/Quote:** Admin creates a request. Status: `LEAD` -> `QUOTE_SENT`.
+2.  **Validation:** Client accepts. Status: `BAT_PENDING` -> `BAT_VALIDATED`.
+3.  **Production (The Workshop):**
+    * Project appears on Student Tablets.
+    * **Tray Management:** Admin assigns a physical "Bac N°" (Tray) to the project.
+    * **Make vs Buy:** Items can be manufactured internally (Laser cut) OR ordered (Supplier).
+    * **Sub-contracting:** Items can be sent out for external engraving.
+4.  **Delivery:** Status `FINISHED` -> `DELIVERED` -> `INVOICED`.
+
+## 4. TECH STACK (NON-NEGOTIABLE)
+* **Frontend:** Next.js 14 (App Router), TypeScript.
+* **Styling:** Tailwind CSS + **Shadcn/UI** (Zinc/New York style).
+* **State/Data:** TanStack Query (v5) for caching and Optimistic UI (Offline resilience).
+* **Backend:** Supabase (PostgreSQL).
+* **Security:**
+    * **Zod:** Strict form validation.
+    * **RLS:** Row Level Security policies enforced at DB level.
+    * **Physical Separation:** Financial data resides in a separate `operations_private` table.
+
+## 5. KEY MODULES
+### A. The Dashboard (Admin)
+* **Bento Grid Layout:** KPIs at top (Revenue, Rush Projects).
+* **Visual Kanban:** Drag and drop projects between statuses.
+* **Live Feed:** Real-time logs of workshop activity ("Théo finished cutting...").
+
+### B. The Workshop (Student)
+* **Mobile View:** No sidebars. Bottom navigation.
+* **Job Sheet:** Scannable QR Codes to open projects instantly.
+* **Task List:** Checkboxes for steps (Cut, Engrave, Clean).
+* **Incident Reporting:** One-tap button to report "Broken Item" or "Machine Issue".
+
+### C. The "Project" Atom
+* A Project can contain multiple **Items** (e.g., A Tournament Project has "10x Medals" + "1x Large Cup").
+* **Specs:** Technical details (Diameter, Material, Lanyard color) are stored in flexible JSONB columns to adapt to any product type.
+
+### D. HR & Time
+* **Punch Clock:** Simple "Start/Stop" button.
+* **Flexibility:** Students can edit past entries (logged as "Edited").
+* **Stats:** Monthly hour recap for payroll.
+
+## 6. CODING STANDARDS
+* **Type Safety:** No `any`. Everything must be typed via Zod or Supabase generated types.
+* **Error Handling:** Use `sonner` for user feedback (Toasts). Fail gracefully.
+* **Performance:** Use Server Components by default. Use Client Components only for interactivity.
+
