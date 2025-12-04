@@ -46,6 +46,11 @@ async function ProjectContent({ id }: { id: string }) {
     return notFound()
   }
 
+  type ProjectWithItems = typeof project & {
+    project_items: Database["public"]["Tables"]["project_items"]["Row"][] | null
+  }
+  const typedProject = project as ProjectWithItems
+
   const formattedDeadline = project.deadline
     ? format(new Date(project.deadline), "EEEE dd MMMM yyyy", { locale: fr })
     : null
@@ -130,8 +135,8 @@ async function ProjectContent({ id }: { id: string }) {
         </div>
 
         <div className="space-y-3">
-          {project.project_items?.length ? (
-            project.project_items.map((item: Database["public"]["Tables"]["project_items"]["Row"]) => (
+          {typedProject.project_items?.length ? (
+            typedProject.project_items.map((item) => (
               <div
                 key={item.id}
                 className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-black/30 backdrop-blur"
