@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { getDeadlineMeta } from "@/lib/deadlines"
+import type { Database } from "@/types/database.types"
 
 export default function ProjectsPage() {
   return (
@@ -43,6 +44,10 @@ export default function ProjectsPage() {
   )
 }
 
+type ProjectWithClient = Database["public"]["Tables"]["projects"]["Row"] & {
+  clients: { name: string | null } | null
+}
+
 async function ProjectsTable() {
   const supabase = createClient()
   const { data: projects, error } = await supabase
@@ -66,7 +71,9 @@ async function ProjectsTable() {
     )
   }
 
-  const sortedProjects = [...projects].sort((a, b) => {
+  const typedProjects = projects as ProjectWithClient[]
+
+  const sortedProjects = [...typedProjects].sort((a, b) => {
     const metaA = getDeadlineMeta(a.deadline)
     const metaB = getDeadlineMeta(b.deadline)
     const urgencyOrder = { past: 0, danger: 1, warning: 2, safe: 3 }
