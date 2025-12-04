@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import { getDeadlineMeta } from "@/lib/deadlines"
 import { QuickItemsTable } from "@/components/features/quick-items-table"
 import { BatPanel } from "@/components/features/bat-panel"
+import type { Database } from "@/types/database.types"
 
 interface ProjectPageProps {
   params: { id: string }
@@ -130,7 +131,7 @@ async function ProjectContent({ id }: { id: string }) {
 
         <div className="space-y-3">
           {project.project_items?.length ? (
-            project.project_items.map((item) => (
+            project.project_items.map((item: Database["public"]["Tables"]["project_items"]["Row"]) => (
               <div
                 key={item.id}
                 className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-black/30 backdrop-blur"
